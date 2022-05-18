@@ -6,7 +6,7 @@ void produzir(int i);
 void consumir(int i);
 int dado = 0, indice = 0;
 int num_produtores = 0, num_consumidores = 0, limite = 0, tam_buffer = 0;
-int buffer[1024];
+int buffer[2048];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int index_consumidor = 0, index_produtor = 0;
 
