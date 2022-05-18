@@ -31,6 +31,7 @@ int main ()
           pthread_join(consumidor_t[i], NULL);
       }
     }
+    return 0;
 }
 void produzir(int i)
 {
