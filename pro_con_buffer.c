@@ -4,11 +4,13 @@
 
 void produzir(int i);
 void consumir(int i);
-int dado = 0, indice = 0;
-int num_produtores = 0, num_consumidores = 0, limite = 0, tam_buffer = 0;
+int isEmpty();
+int isFull();
+int dado = 0, indice = 0, num_produtores = 0, num_consumidores = 0, limite = 0, tam_buffer = 0;
 int buffer[2048];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int index_consumidor = 0, index_produtor = 0;
+int j_prod = 0, l_con = 0;
 
 int main ()
 {
@@ -40,12 +42,20 @@ void produzir(int i)
         indice = 0;
     }
     dado = 2 * indice + 1;
-    for (int j = 0; j < tam_buffer; j++) {
-        if (buffer[j] == NULL) {
-            printf("Produtor %d produzindo %d na posição %d\n", i, dado, j);
-            buffer[j] = dado;
-            break;
-        }
+
+    if (isFull() == 0) {
+      while (1) {
+          if (j_prod == tam_buffer) {
+              j_prod = 0;
+          }
+          if (buffer[j_prod] == NULL) {
+              printf("Produtor %d produzindo %d na posição %d\n", i, dado, j_prod);
+              buffer[j_prod] = dado;
+              j_prod++;
+              break;
+          }
+          j_prod++;
+      }
     }
     indice++;
     pthread_mutex_unlock(&mutex);
@@ -53,12 +63,37 @@ void produzir(int i)
 void consumir(int i)
 {
     pthread_mutex_lock(&mutex);
-    for (int l = 0; l < tam_buffer; l++) {
-        if (buffer[l] != NULL) {
-            printf("Consumidor %d consumindo %d na posição %d\n", i, buffer[l], l);
-            buffer[l] = NULL;
-            break;
+    if(isEmpty() == 0){
+          while (1) {
+              if (l_con == tam_buffer) {
+                  l_con = 0;
+              }
+              if (buffer[l_con] != NULL) {
+                  printf("Consumidor %d consumindo %d na posição %d\n", i, buffer[l_con], l_con);
+                  buffer[l_con] = NULL;
+                  l_con++;
+                  break;
+              }
+             l_con++;
         }
     }
     pthread_mutex_unlock(&mutex);
+}
+int isEmpty()
+{
+    for (int i = 0; i < tam_buffer; i++) {
+        if (buffer[i] != NULL) {
+            return 0;
+        }
+    }
+    return  1;
+}
+int isFull()
+{
+    for (int i = 0; i < tam_buffer; i++) {
+        if (buffer[i] == NULL) {
+            return 0;
+        }
+    }
+    return  1;
 }
